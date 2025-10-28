@@ -5,9 +5,9 @@
 pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
 // motor groups
-pros::MotorGroup leftMotors({-5, 4, -3},
+pros::MotorGroup leftMotors({12, 19},
                             pros::MotorGearset::blue); // left motor group - ports 3 (reversed), 4, 5 (reversed)
-pros::MotorGroup rightMotors({6, -9, 7}, pros::MotorGearset::blue); // right motor group - ports 6, 7, 9 (reversed)
+pros::MotorGroup rightMotors({13, 11}, pros::MotorGearset::blue); // right motor group - ports 6, 7, 9 (reversed)
 
 pros::Motor test(2);
 
@@ -169,11 +169,11 @@ void opcontrol() {
     // loop to continuously update motors
     while (true) {
         // get joystick positions?
-        /*
-        int leftY = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
+        
         int rightX = controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
+        int leftY = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
         // move the chassis with curvature drive
-        chassis.arcade(leftY, rightX);*/
+        chassis.arcade(rightX, leftY);
 
         //test
         test.move(controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y));
