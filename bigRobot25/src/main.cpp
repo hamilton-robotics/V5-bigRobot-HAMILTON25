@@ -1,6 +1,6 @@
 #include "main.h"
 #include "lemlib/api.hpp" // IWYU pragma: keep
-
+// TEST
 // controller
 pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
@@ -8,6 +8,8 @@ pros::Controller controller(pros::E_CONTROLLER_MASTER);
 pros::MotorGroup leftMotors({-5, 4, -3},
                             pros::MotorGearset::blue); // left motor group - ports 3 (reversed), 4, 5 (reversed)
 pros::MotorGroup rightMotors({6, -9, 7}, pros::MotorGearset::blue); // right motor group - ports 6, 7, 9 (reversed)
+
+pros::Motor test(2);
 
 // Inertial Sensor on port 10
 pros::Imu imu(10);
@@ -166,11 +168,16 @@ void opcontrol() {
     // controller
     // loop to continuously update motors
     while (true) {
-        // get joystick positions
+        // get joystick positions?
+        /*
         int leftY = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
         int rightX = controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
         // move the chassis with curvature drive
-        chassis.arcade(leftY, rightX);
+        chassis.arcade(leftY, rightX);*/
+
+        //test
+        test.move(controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y));
+
         // delay to save resources
         pros::delay(10);
     }
