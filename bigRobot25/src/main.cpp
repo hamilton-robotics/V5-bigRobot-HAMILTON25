@@ -1,24 +1,50 @@
 #include "main.h"
 #include "lemlib/api.hpp" // IWYU pragma: keep
+
+using namespace pros;
+
 // TEST
 // controller
-pros::Controller controller(pros::E_CONTROLLER_MASTER);
+Controller controller(E_CONTROLLER_MASTER);
+
+const int RED_BLOCK_IND = 1;
+const int BLUE_BLOCK_IND = 2;
+const int NUM_VISION_OBJECTS = 4;
+
+Vision visionSensor(10);
+
+// RED_BLOCK: (1, 8897, 10143, 9520, -863, -129, -496, 8.400, 0);
+// BLUE_BLOCK: (2, -4197, -3603, -3900, 2015, 8441, 5228, 4.800, 0);
+vision_signature_s_t RED_BLOCK = Vision::signature_from_utility(RED_BLOCK_IND, 8897, 10143, 9520, -863, -129, -496, 8.400, 0);
+vision_signature_s_t BLUE_BLOCK = Vision::signature_from_utility(BLUE_BLOCK_IND, -4197, -3603, -3900, 2015, 8441, 5228, 5.000, 0);
+
+//Vision RED_BLOCK (1, 8897, 10143, 9520, -863, -129, -496, 8.400, 0);
+//Vision::signature BLUE_BLOCK (2, -4197, -3603, -3900, 2015, 8441, 5228, 5.000, 0);
+// Vision::signature SIG_3 (3, 0, 0, 0, 0, 0, 0, 3.000, 0);
+// vision::signature SIG_4 (4, 0, 0, 0, 0, 0, 0, 3.000, 0);
+// vision::signature SIG_5 (5, 0, 0, 0, 0, 0, 0, 3.000, 0);
+// vision::signature SIG_6 (6, 0, 0, 0, 0, 0, 0, 3.000, 0);
+// vision::signature SIG_7 (7, 0, 0, 0, 0, 0, 0, 3.000, 0);
+// vex::vision vision1 ( vex::PORT1, 50, RED_BLOCK, BLUE_BLOCK, SIG_3, SIG_4, SIG_5, SIG_6, SIG_7 );
+
+
+
 
 // motor groups
-pros::MotorGroup leftMotors({12, 19},
-                            pros::MotorGearset::blue); // left motor group - ports 3 (reversed), 4, 5 (reversed)
-pros::MotorGroup rightMotors({13, 11}, pros::MotorGearset::blue); // right motor group - ports 6, 7, 9 (reversed)
+MotorGroup leftMotors({12, 19},
+                            MotorGearset::blue); // left motor group - ports 3 (reversed), 4, 5 (reversed)
+MotorGroup rightMotors({13, 11}, MotorGearset::blue); // right motor group - ports 6, 7, 9 (reversed)
 
-pros::Motor test(2);
+Motor test(2);
 
 // Inertial Sensor on port 10
-pros::Imu imu(10);
+Imu imu(10);
 
 // tracking wheels
 // horizontal tracking wheel encoder. Rotation sensor, port 20, not reversed
-pros::Rotation horizontalEnc(20);
+Rotation horizontalEnc(20);
 // vertical tracking wheel encoder. Rotation sensor, port 11, reversed
-pros::Rotation verticalEnc(-11);
+Rotation verticalEnc(-11);
 // horizontal tracking wheel. 2.75" diameter, 5.75" offset, back of the robot (negative)
 lemlib::TrackingWheel horizontal(&horizontalEnc, lemlib::Omniwheel::NEW_275, -5.75);
 // vertical tracking wheel. 2.75" diameter, 2.5" offset, left of the robot (negative)
@@ -87,7 +113,8 @@ lemlib::Chassis chassis(drivetrain, linearController, angularController, sensors
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-    pros::lcd::initialize(); // initialize brain screen
+    visionSensor.clear_led();
+    lcd::initialize(); // initialize brain screen
     chassis.calibrate(); // calibrate sensors
 
     // the default rate is 50. however, if you need to change the rate, you
@@ -99,16 +126,16 @@ void initialize() {
     // works, refer to the fmtlib docs
 
     // thread to for brain screen and position logging
-    pros::Task screenTask([&]() {
+    Task screenTask([&]() {
         while (true) {
             // print robot location to the brain screen
-            pros::lcd::print(0, "X: %f", chassis.getPose().x); // x
-            pros::lcd::print(1, "Y: %f", chassis.getPose().y); // y
-            pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading
+            lcd::print(0, "X: %f", chassis.getPose().x); // x
+            lcd::print(1, "Y: %f", chassis.getPose().y); // y
+            lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading
             // log position telemetry
             lemlib::telemetrySink()->info("Chassis pose: {}", chassis.getPose());
             // delay to save resources
-            pros::delay(50);
+            delay(50);
         }
     });
 }
@@ -155,30 +182,49 @@ void autonomous() {
     // the movement will run immediately
     // Unless its another movement, in which case it will wait
     chassis.waitUntil(10);
-    pros::lcd::print(4, "Traveled 10 inches during pure pursuit!");
+    lcd::print(4, "Traveled 10 inches during pure pursuit!");
     // wait until the movement is done
     chassis.waitUntilDone();
-    pros::lcd::print(4, "pure pursuit finished!");
+    lcd::print(4, "pure pursuit finished!");
 }
 
 /**
  * Runs in driver control
  */
+
 void opcontrol() {
     // controller
     // loop to continuously update motors
+
+    visionSensor.set_signature(RED_BLOCK_IND, &RED_BLOCK);
+    visionSensor.set_signature(BLUE_BLOCK_IND, &BLUE_BLOCK);
+
+    vision_object_s_t object_arr[NUM_VISION_OBJECTS];
+    vision_color_code_t comp = visionSensor.create_color_code(RED_BLOCK_IND, BLUE_BLOCK_IND);
+
+     
     while (true) {
         // get joystick positions?
-        
-        int rightX = controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
-        int leftY = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
+        vision_object_s_t rtn = visionSensor.get_by_sig(0, RED_BLOCK_IND);
+        visionSensor.read_by_sig(0, RED_BLOCK_IND, NUM_VISION_OBJECTS, object_arr);
+        if (rtn.signature == RED_BLOCK_IND) {
+            test.move(100);
+            lcd::print (3, "red found");
+        }
+
+        lcd::print (4, "RTN sig: %f", rtn.signature);
+        lcd::print (5, "Red sig: %f", RED_BLOCK_IND);
+
+        int rightX = controller.get_analog(E_CONTROLLER_ANALOG_RIGHT_X);
+        int leftY = controller.get_analog(E_CONTROLLER_ANALOG_LEFT_Y);
         // move the chassis with curvature drive
         chassis.arcade(rightX, leftY);
 
         //test
-        test.move(controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y));
+        //test.move(100);
 
         // delay to save resources
-        pros::delay(10);
+        delay(10);
     }
 }
+
