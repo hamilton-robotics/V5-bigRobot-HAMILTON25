@@ -1,3 +1,18 @@
+**NOVEMBER 8 UPDATE:** 
+
+__Done:__  
+Attempted a new user to upload from working computer (did not work) \
+Tested intake motors (code appears bug free but couldn't test bc of uploading) 
+
+__To Do:__  
+Tune PID\
+Test color sensors\
+Get uploading working on literally anyones laptop!
+Properly test intake motors 
+
+__Bugs:__  
+Unknown because of upload issues
+
 **NOVEMBER 1 UPDATE:** 
 
 __Done:__  

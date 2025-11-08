@@ -35,7 +35,10 @@ MotorGroup leftMotors({12, 19},
                             MotorGearset::blue); // left motor group - ports 3 (reversed), 4, 5 (reversed)
 MotorGroup rightMotors({13, 11}, MotorGearset::blue); // right motor group - ports 6, 7, 9 (reversed)
 
-Motor test(2);
+// intake testing
+MotorGroup intake({-2, 3}, MotorGearset::blue);
+
+//Motor intake_right(3);
 
 // Inertial Sensor on port 10
 Imu imu(10);
@@ -204,11 +207,11 @@ void opcontrol() {
 
      
     while (true) {
-        // get joystick positions?
+        //get joystick positions?
         vision_object_s_t rtn = visionSensor.get_by_sig(0, RED_BLOCK_IND);
         visionSensor.read_by_sig(0, RED_BLOCK_IND, NUM_VISION_OBJECTS, object_arr);
         if (rtn.signature == RED_BLOCK_IND) {
-            test.move(100);
+            //test.move(100);
             lcd::print (3, "red found");
         }
 
@@ -217,8 +220,15 @@ void opcontrol() {
 
         int rightX = controller.get_analog(E_CONTROLLER_ANALOG_RIGHT_X);
         int leftY = controller.get_analog(E_CONTROLLER_ANALOG_LEFT_Y);
+        int leftX = controller.get_analog(E_CONTROLLER_ANALOG_LEFT_X);
+
         // move the chassis with curvature drive
         chassis.arcade(rightX, leftY);
+
+        // intake_left.move(-leftX);
+        // intake_right.move(leftX);
+
+        intake.move(leftX);
 
         //test
         //test.move(100);
