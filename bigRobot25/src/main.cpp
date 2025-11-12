@@ -3,7 +3,6 @@
 
 using namespace pros;
 
-// TEST
 // controller
 Controller controller(E_CONTROLLER_MASTER);
 
@@ -11,12 +10,13 @@ const int RED_BLOCK_IND = 1;
 const int BLUE_BLOCK_IND = 2;
 const int NUM_VISION_OBJECTS = 4;
 
-Vision visionSensor(10);
+Vision visionSensor(16);
 
 // RED_BLOCK: (1, 8897, 10143, 9520, -863, -129, -496, 8.400, 0);
 // BLUE_BLOCK: (2, -4197, -3603, -3900, 2015, 8441, 5228, 4.800, 0);
 vision_signature_s_t RED_BLOCK = Vision::signature_from_utility(RED_BLOCK_IND, 8897, 10143, 9520, -863, -129, -496, 8.400, 0);
 vision_signature_s_t BLUE_BLOCK = Vision::signature_from_utility(BLUE_BLOCK_IND, -4197, -3603, -3900, 2015, 8441, 5228, 5.000, 0);
+int COMPCOLORS[2] = {RED_BLOCK_IND, BLUE_BLOCK_IND};
 
 //Vision RED_BLOCK (1, 8897, 10143, 9520, -863, -129, -496, 8.400, 0);
 //Vision::signature BLUE_BLOCK (2, -4197, -3603, -3900, 2015, 8441, 5228, 5.000, 0);
@@ -27,21 +27,20 @@ vision_signature_s_t BLUE_BLOCK = Vision::signature_from_utility(BLUE_BLOCK_IND,
 // vision::signature SIG_7 (7, 0, 0, 0, 0, 0, 0, 3.000, 0);
 // vex::vision vision1 ( vex::PORT1, 50, RED_BLOCK, BLUE_BLOCK, SIG_3, SIG_4, SIG_5, SIG_6, SIG_7 );
 
-
-
+const int LEFT_FRONT = 12;
+const int LEFT_BACK = 19;
+const int RIGHT_FRONT = 13;
+const int RIGHT_BACK = 11;
 
 // motor groups
-MotorGroup leftMotors({12, 19},
-                            MotorGearset::blue); // left motor group - ports 3 (reversed), 4, 5 (reversed)
+MotorGroup leftMotors({12, 19}, MotorGearset::blue); // left motor group - ports 3 (reversed), 4, 5 (reversed)
 MotorGroup rightMotors({13, 11}, MotorGearset::blue); // right motor group - ports 6, 7, 9 (reversed)
 
 // intake testing
 MotorGroup intake({-2, 3}, MotorGearset::blue);
 
-//Motor intake_right(3);
-
-// Inertial Sensor on port 10
-Imu imu(10);
+// Inertial Sensor on port 11
+Imu imu(11);
 
 // tracking wheels
 // horizontal tracking wheel encoder. Rotation sensor, port 20, not reversed
@@ -116,6 +115,9 @@ lemlib::Chassis chassis(drivetrain, linearController, angularController, sensors
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
+    visionSensor.set_signature(RED_BLOCK_IND, &RED_BLOCK);
+    visionSensor.set_signature(BLUE_BLOCK_IND, &BLUE_BLOCK);
+
     visionSensor.clear_led();
     lcd::initialize(); // initialize brain screen
     chassis.calibrate(); // calibrate sensors
@@ -194,29 +196,28 @@ void autonomous() {
 /**
  * Runs in driver control
  */
+int LARGEST = 0;
 
 void opcontrol() {
-    // controller
-    // loop to continuously update motors
-
-    visionSensor.set_signature(RED_BLOCK_IND, &RED_BLOCK);
-    visionSensor.set_signature(BLUE_BLOCK_IND, &BLUE_BLOCK);
-
-    vision_object_s_t object_arr[NUM_VISION_OBJECTS];
-    vision_color_code_t comp = visionSensor.create_color_code(RED_BLOCK_IND, BLUE_BLOCK_IND);
-
-     
+    //vision_object_s_t object_arr[NUM_VISION_OBJECTS];
+    vision_color_code_t compColors = visionSensor.create_color_code(RED_BLOCK_IND, BLUE_BLOCK_IND);
+    
     while (true) {
-        //get joystick positions?
-        vision_object_s_t rtn = visionSensor.get_by_sig(0, RED_BLOCK_IND);
-        visionSensor.read_by_sig(0, RED_BLOCK_IND, NUM_VISION_OBJECTS, object_arr);
-        if (rtn.signature == RED_BLOCK_IND) {
-            //test.move(100);
+        // vision_object_s_t redObj = visionSensor.get_by_sig(LARGEST, RED_BLOCK_IND);
+        // vision_object_s_t blueObj = visionSensor.get_by_sig(LARGEST, BLUE_BLOCK_IND);
+        //visionSensor.read_by_sig(0, RED_BLOCK_IND, NUM_VISION_OBJECTS, object_arr);
+        vision_object_s_t largestObject = visionSensor.get_by_code(LARGEST, compColors);
+        if (largestObject.signature == COMPCOLORS[0]) {
+            intake.move(100);
+            lcd::print (3, " found");
+        }
+        else if (largestObject.signature == BLUE_BLOCK_IND) {
+            intake.move(-100);
             lcd::print (3, "red found");
         }
-
-        lcd::print (4, "RTN sig: %f", rtn.signature);
-        lcd::print (5, "Red sig: %f", RED_BLOCK_IND);
+        else {
+            intake.move(0);
+        }
 
         int rightX = controller.get_analog(E_CONTROLLER_ANALOG_RIGHT_X);
         int leftY = controller.get_analog(E_CONTROLLER_ANALOG_LEFT_Y);
@@ -225,16 +226,22 @@ void opcontrol() {
         // move the chassis with curvature drive
         chassis.arcade(rightX, leftY);
 
-        // intake_left.move(-leftX);
-        // intake_right.move(leftX);
 
-        intake.move(leftX);
-
-        //test
-        //test.move(100);
+        //intake.move(leftX);
 
         // delay to save resources
         delay(10);
     }
 }
 
+// VISION SIGNATURES FROM SENSOR B:
+
+// vision::signature RED_BLOCK (1, 7551, 8127, 7838, -1, 511, 254, 3.000, 1);
+// vision::signature BLUE_BLOCK (2, -3901, -3463, -3682, 8263, 9401, 8832, 3.000, 1);
+// vision::signature SIG_3 (3, 0, 0, 0, 0, 0, 0, 3.000, 0);
+// vision::signature SIG_4 (4, 0, 0, 0, 0, 0, 0, 3.000, 0);
+// vision::signature SIG_5 (5, 0, 0, 0, 0, 0, 0, 3.000, 0);
+// vision::signature SIG_6 (6, 0, 0, 0, 0, 0, 0, 3.000, 0);
+// vision::signature SIG_7 (7, 0, 0, 0, 0, 0, 0, 3.000, 0);
+// 
+// vex::vision vision1 ( vex::PORT1, 50, RED_BLOCK, BLUE_BLOCK, SIG_3, SIG_4, SIG_5, SIG_6, SIG_7 );

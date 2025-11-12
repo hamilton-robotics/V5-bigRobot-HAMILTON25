@@ -1,3 +1,18 @@
+**NOVEMBER 11 UPDATE:** 
+
+__Done:__  
+Confirmed intake code works \
+Neatened code a bit \
+Made progress on understanding color sensor code 
+
+__To Do:__  
+Tune PID\
+Fix color sensors\
+Get uploading working on literally anyones laptop! 
+
+__Bugs:__  
+Can get it to sense one color, but can't get it to change behavior when color changes/goes away
+
 **NOVEMBER 8 UPDATE:** 
 
 __Done:__  
