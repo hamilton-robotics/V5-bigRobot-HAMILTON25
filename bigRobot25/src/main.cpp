@@ -12,20 +12,11 @@ const int NUM_VISION_OBJECTS = 4;
 
 Vision visionSensor(16);
 
-// RED_BLOCK: (1, 8897, 10143, 9520, -863, -129, -496, 8.400, 0);
-// BLUE_BLOCK: (2, -4197, -3603, -3900, 2015, 8441, 5228, 4.800, 0);
-vision_signature_s_t RED_BLOCK = Vision::signature_from_utility(RED_BLOCK_IND, 8897, 10143, 9520, -863, -129, -496, 8.400, 0);
-vision_signature_s_t BLUE_BLOCK = Vision::signature_from_utility(BLUE_BLOCK_IND, -4197, -3603, -3900, 2015, 8441, 5228, 5.000, 0);
-int COMPCOLORS[2] = {RED_BLOCK_IND, BLUE_BLOCK_IND};
-
-//Vision RED_BLOCK (1, 8897, 10143, 9520, -863, -129, -496, 8.400, 0);
-//Vision::signature BLUE_BLOCK (2, -4197, -3603, -3900, 2015, 8441, 5228, 5.000, 0);
-// Vision::signature SIG_3 (3, 0, 0, 0, 0, 0, 0, 3.000, 0);
-// vision::signature SIG_4 (4, 0, 0, 0, 0, 0, 0, 3.000, 0);
-// vision::signature SIG_5 (5, 0, 0, 0, 0, 0, 0, 3.000, 0);
-// vision::signature SIG_6 (6, 0, 0, 0, 0, 0, 0, 3.000, 0);
-// vision::signature SIG_7 (7, 0, 0, 0, 0, 0, 0, 3.000, 0);
-// vex::vision vision1 ( vex::PORT1, 50, RED_BLOCK, BLUE_BLOCK, SIG_3, SIG_4, SIG_5, SIG_6, SIG_7 );
+// RED_BLOCK: (1, 10225, 11583, 10904, -1849, -1327, -1588, 9.000, 0);
+// BLUE_BLOCK: (2, -3223, -2863, -3042, 7347, 7919, 7632, 9.000, 0);
+vision_signature_s_t RED_BLOCK = Vision::signature_from_utility(RED_BLOCK_IND, 10225, 11583, 10904, -1849, -1327, -1588, 9.000, 0);
+vision_signature_s_t BLUE_BLOCK = Vision::signature_from_utility(BLUE_BLOCK_IND, -3223, -2863, -3042, 7347, 7919, 7632, 9.000, 0);
+//int COMPCOLORS[2] = {RED_BLOCK_IND, BLUE_BLOCK_IND};
 
 const int LEFT_FRONT = 12;
 const int LEFT_BACK = 19;
@@ -199,29 +190,30 @@ void autonomous() {
 int LARGEST = 0;
 
 void opcontrol() {
-    //vision_object_s_t object_arr[NUM_VISION_OBJECTS];
     vision_color_code_t compColors = visionSensor.create_color_code(RED_BLOCK_IND, BLUE_BLOCK_IND);
     
     while (true) {
-        // vision_object_s_t redObj = visionSensor.get_by_sig(LARGEST, RED_BLOCK_IND);
-        // vision_object_s_t blueObj = visionSensor.get_by_sig(LARGEST, BLUE_BLOCK_IND);
+    vision_object_s_t object_arr[NUM_VISION_OBJECTS];
+        vision_object_s_t redObj = visionSensor.get_by_sig(0, 1);
+        vision_object_s_t blueObj = visionSensor.get_by_sig(0, 2);
         //visionSensor.read_by_sig(0, RED_BLOCK_IND, NUM_VISION_OBJECTS, object_arr);
-        vision_object_s_t largestObject = visionSensor.get_by_code(LARGEST, compColors);
-        if (largestObject.signature == COMPCOLORS[0]) {
-            intake.move(100);
-            lcd::print (3, " found");
+        //vision_object_s_t largestObject = visionSensor.get_by_sig(LARGEST, RED_BLOCK_IND);
+
+        if ((blueObj.width * blueObj.height) > (redObj.width * redObj.height)) {
+            //intake.move(75);
+            lcd::print (3, "blue found");
         }
-        else if (largestObject.signature == BLUE_BLOCK_IND) {
-            intake.move(-100);
+        else if ((blueObj.width * blueObj.height) < (redObj.width * redObj.height)) {
+            //intake.move(50);
             lcd::print (3, "red found");
         }
         else {
-            intake.move(0);
+            //intake.move(0);
+            lcd::print (3, "nothing found");
         }
 
         int rightX = controller.get_analog(E_CONTROLLER_ANALOG_RIGHT_X);
         int leftY = controller.get_analog(E_CONTROLLER_ANALOG_LEFT_Y);
-        int leftX = controller.get_analog(E_CONTROLLER_ANALOG_LEFT_X);
 
         // move the chassis with curvature drive
         chassis.arcade(rightX, leftY);

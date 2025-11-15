@@ -1,3 +1,17 @@
+
+**NOVEMBER 15 UPDATE:** 
+
+__Done:__  
+Made progress on understanding color sensor code? 
+
+__To Do:__  
+Tune PID\
+Fix color sensors\
+Get uploading working on literally anyones laptop! 
+
+__Bugs:__  
+Honestly, I don't know. Something is going wrong, we're maybe getting closer, but its not going great
+
 **NOVEMBER 11 UPDATE:** 
 
 __Done:__  
