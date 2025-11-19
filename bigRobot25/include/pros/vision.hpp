@@ -114,7 +114,7 @@ class Vision : public Device {
 	 * void opcontrol() {
 	 * pros::Vision vision_sensor(VISION_PORT);
 	 * // values acquired from the vision utility
-	 * vision_signature_s_t RED_SIG =
+	 * vision_signature_s_t fSIG =
 	 *   vision_signature_from_utility(EXAMPLE_SIG, 8973, 11143, 10058, -2119, -1053, -1586, 5.4, 0);
 	 * vision_sensor.set_signature(EXAMPLE_SIG, &RED_SIG);
 	 * while (true) {
@@ -689,7 +689,7 @@ class Vision : public Device {
 
 	/**
 	 * Sets the (0,0) coordinate for the Field of View.
-	 *
+	 *ƒ
 	 * This will affect the coordinates returned for each request for a
 	 * vision_object_s_t from the sensor, so it is recommended that this function
 	 * only be used to configure the sensor at the beginning of its use.

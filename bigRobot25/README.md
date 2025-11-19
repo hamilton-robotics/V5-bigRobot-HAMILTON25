@@ -1,3 +1,30 @@
+**NOVEMBER 18 UPDATE:** 
+
+__Done:__  
+Got color sensor working including with intake!
+
+__To Do:__  
+Tune PID\
+Tune color sensors to mount\
+Get uploading working on literally anyones laptop! 
+
+__Bugs:__  
+The largest object in vision sensor is not correct. It always uses red/team if it's seen.\
+
+**NOVEMBER 11 UPDATE:** 
+
+__Done:__  
+Confirmed intake code works \
+Neatened code a bit \
+Made progress on understanding color sensor code 
+
+__To Do:__  
+Tune PID\
+Fix color sensors\
+Get uploading working on literally anyones laptop! 
+
+__Bugs:__  
+Can get it to sense one color, but can't get it to change behavior when color changes/goes away
 
 **NOVEMBER 15 UPDATE:** 
 
