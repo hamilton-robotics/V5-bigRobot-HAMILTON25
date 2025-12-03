@@ -1,0 +1,17 @@
+BIG ROBOT:
+Outake:
+Directions are subject to test/mech
+- R1 -> low outake (both +)
+- L2 -> medium outake (top + middle -)
+- L1 -> top outake (both -)
+
+make two new motors with consts for ports
+if statements for corresponding directions/speeds, otherwise no movement
+
+Before competition: upload team red and team blue versions of code
+
+SMALL ROBOT:
+Intake/Drive same as big (copy over)
+Outake on R1
+Conveyor will have buttons but questions for mech/drivers
+    When does conveyor move?

@@ -1,7 +1,21 @@
+**DECEMBTER 2 UPDATE:** 
+
+__Done:__  
+Draft of all big robot code 
+
+__To Do:__  
+Tune PID\
+Tune color sensors to mount\
+Get uploading working on literally anyones laptop! 
+
+__Bugs:__  
+The largest object in vision sensor is not correct. It always uses red/team if it's seen.\
+
+
 **NOVEMBER 18 UPDATE:** 
 
 __Done:__  
-Got color sensor working including with intake!
+Got color sensor working including with intake! 
 
 __To Do:__  
 Tune PID\

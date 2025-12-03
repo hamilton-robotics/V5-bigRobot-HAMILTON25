@@ -17,7 +17,9 @@ MotorGroup leftMotors({LEFT_FRONT, LEFT_BACK}, MotorGearset::blue); // left moto
 MotorGroup rightMotors({RIGHT_FRONT, RIGHT_BACK}, MotorGearset::blue); // right motor group - ports 6, 7, 9 (reversed)
 
 // intake testing
-MotorGroup intake({INT_CW, INT_CCW}, MotorGearset::blue);
+MotorGroup intakeMotors({INT_CW, INT_CCW}, MotorGearset::blue);
+Motor outTop(OUT_TOP);  
+Motor outBot(OUT_BOT); 
 
 // Inertial Sensor on port 11
 Imu imu(11);
@@ -147,36 +149,64 @@ void autonomous() {
     lcd::print(4, "pure pursuit finished!");
 }
 
-/**
+// drive
+void drive() {
+    // get amount to move from joysticks
+    int rightX = controller.get_analog(E_CONTROLLER_ANALOG_RIGHT_X);
+    int leftY = controller.get_analog(E_CONTROLLER_ANALOG_LEFT_Y);
+
+    // move the chassis with curvature drive
+    chassis.arcade(rightX, leftY);
+}
+
+// intake based off of color
+void intake() {
+    // get biggest object (doesn't work as expected)
+    vision_object_s_t biggestObj = visionSensor.get_by_size(LARGEST);
+
+    // if R1 is pressed, spin slow
+    if (controller.get_digital(E_CONTROLLER_DIGITAL_R2)) {
+        intakeMotors.move(25);
+        // if a color is sensed, spin faster in the correct direction
+        if (biggestObj.signature == OPP_ID) {
+            intakeMotors.move(-100);
+        }
+        else if (biggestObj.signature == TEAM_ID) {
+            intakeMotors.move(100);
+        }
+    }
+    else {
+        intakeMotors.move(0);
+    }
+}
+
+// Does outake based off of button press
+void outake() {
+    if (controller.get_digital(E_CONTROLLER_DIGITAL_R1)) {
+        outBot.move(-100);
+    }
+    else if (controller.get_digital(E_CONTROLLER_DIGITAL_L1)) {
+        outTop.move(-100);
+        outBot.move(100);
+    }
+    else if (controller.get_digital(E_CONTROLLER_DIGITAL_L2)) {
+        outTop.move(100);
+        outBot.move(100);
+    }
+    else {
+        outTop.move(0);
+        outBot.move(0);
+    }
+}
+
+/*
  * Runs in driver control
  */
 void opcontrol() {
-
     while (true) {
-        // get biggest object (doesn't work as expected)
-        vision_object_s_t biggestObj = visionSensor.get_by_size(LARGEST);
-
-        // if R1 is pressed, spin slow
-        if (controller.get_digital(E_CONTROLLER_DIGITAL_R1)) {
-            intake.move(25);
-            // if a color is sensed, spin faster in the correct direction
-            if (biggestObj.signature == OPP_ID) {
-                intake.move(-100);
-            }
-            else if (biggestObj.signature == TEAM_ID) {
-                intake.move(100);
-            }
-        }
-        else {
-            intake.move(0);
-        }
-
-        // get amount to move from joysticks
-        int rightX = controller.get_analog(E_CONTROLLER_ANALOG_RIGHT_X);
-        int leftY = controller.get_analog(E_CONTROLLER_ANALOG_LEFT_Y);
-
-        // move the chassis with curvature drive
-        chassis.arcade(rightX, leftY);
+        drive();
+        intake();
+        outake();
 
         // delay to save resources
         delay(10);
