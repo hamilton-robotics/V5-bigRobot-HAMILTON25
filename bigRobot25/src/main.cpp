@@ -155,6 +155,11 @@ void drive() {
     int rightX = controller.get_analog(E_CONTROLLER_ANALOG_RIGHT_X);
     int leftY = controller.get_analog(E_CONTROLLER_ANALOG_LEFT_Y);
 
+    if (controller.get_digital(E_CONTROLLER_DIGITAL_R1)) {
+        rightX /= 2;
+        leftY /= 2;
+    }
+
     // move the chassis with curvature drive
     chassis.arcade(rightX, leftY);
 }
@@ -182,10 +187,11 @@ void intake() {
 
 // Does outake based off of button press
 void outake() {
-    if (controller.get_digital(E_CONTROLLER_DIGITAL_R1)) {
-        outBot.move(-100);
-    }
-    else if (controller.get_digital(E_CONTROLLER_DIGITAL_L1)) {
+    // if (controller.get_digital(E_CONTROLLER_DIGITAL_R1)) {
+    //     outBot.move(-100);
+    // }
+    // else 
+    if (controller.get_digital(E_CONTROLLER_DIGITAL_L1)) {
         outTop.move(-100);
         outBot.move(100);
     }
