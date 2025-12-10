@@ -17,9 +17,9 @@ MotorGroup leftMotors({LEFT_FRONT, LEFT_BACK}, MotorGearset::blue); // left moto
 MotorGroup rightMotors({RIGHT_FRONT, RIGHT_BACK}, MotorGearset::blue); // right motor group - ports 6, 7, 9 (reversed)
 
 // intake testing
-MotorGroup intakeMotors({INT_CW, INT_CCW}, MotorGearset::blue);
-Motor outTop(OUT_TOP);  
-Motor outBot(OUT_BOT); 
+MotorGroup intakeMotors({INT_CW, INT_CCW}, MotorGearset::green);
+Motor outTop(OUT_TOP, MotorGearset::green);  
+Motor outBot(OUT_BOT, MotorGearset::green); 
 
 // Inertial Sensor on port 11
 Imu imu(11);
@@ -167,18 +167,25 @@ void drive() {
 // intake based off of color
 void intake() {
     // get biggest object (doesn't work as expected)
-    vision_object_s_t biggestObj = visionSensor.get_by_size(LARGEST);
+    // vision_object_s_t biggestObj = visionSensor.get_by_size(LARGEST);
 
-    // if R1 is pressed, spin slow
+    // // if R1 is pressed, spin slow
+    // if (controller.get_digital(E_CONTROLLER_DIGITAL_R2)) {
+    //     intakeMotors.move(25);
+    //     // if a color is sensed, spin faster in the correct direction
+    //     if (biggestObj.signature == OPP_ID) {
+    //         intakeMotors.move(-100);
+    //     }
+    //     else if (biggestObj.signature == TEAM_ID) {
+    //         intakeMotors.move(100);
+    //     }
+    // }
+    // else {
+    //     intakeMotors.move(0);
+    // }
+
     if (controller.get_digital(E_CONTROLLER_DIGITAL_R2)) {
-        intakeMotors.move(25);
-        // if a color is sensed, spin faster in the correct direction
-        if (biggestObj.signature == OPP_ID) {
-            intakeMotors.move(-100);
-        }
-        else if (biggestObj.signature == TEAM_ID) {
-            intakeMotors.move(100);
-        }
+        intakeMotors.move(100);
     }
     else {
         intakeMotors.move(0);
@@ -187,11 +194,10 @@ void intake() {
 
 // Does outake based off of button press
 void outake() {
-    // if (controller.get_digital(E_CONTROLLER_DIGITAL_R1)) {
-    //     outBot.move(-100);
-    // }
-    // else 
-    if (controller.get_digital(E_CONTROLLER_DIGITAL_L1)) {
+    if (controller.get_digital(E_CONTROLLER_DIGITAL_R1)) {
+        outBot.move(-100);
+    }
+    else if (controller.get_digital(E_CONTROLLER_DIGITAL_L1)) {
         outTop.move(-100);
         outBot.move(100);
     }
@@ -204,6 +210,8 @@ void outake() {
         outBot.move(0);
     }
 }
+
+// 1 2 3 4 5 6 7 8 9 0
 
 /*
  * Runs in driver control

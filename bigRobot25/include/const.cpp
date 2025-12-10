@@ -19,7 +19,7 @@ const int INT_CW = 2;
 const int INT_CCW = -3;
 
 const int OUT_TOP = 6;
-const int OUT_BOT = 7;
+const int OUT_BOT = -7;
 
 
 // vision sensor port
