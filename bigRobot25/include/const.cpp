@@ -21,6 +21,10 @@ const int INT_CCW = -3;
 const int OUT_TOP = 6;
 const int OUT_BOT = -7;
 
+// motor speeds
+const int FAST = 100;
+const int HALT = 0;
+const int SLOW = 25;
 
 // vision sensor port
 const int VIS_PORT = 16;
