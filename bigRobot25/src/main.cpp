@@ -13,8 +13,8 @@ vision_signature_s_t RED_BLOCK = Vision::signature_from_utility(RED_BLOCK_ID, 88
 vision_signature_s_t BLUE_BLOCK = Vision::signature_from_utility (BLUE_BLOCK_ID, -4197, -3603, -3900, 2015, 8441, 5228, 5.000, 0);
 
 // motor groups
-MotorGroup leftMotors({LEFT_FRONT, LEFT_BACK}, MotorGearset::blue); // left motor group - ports 3 (reversed), 4, 5 (reversed)
-MotorGroup rightMotors({RIGHT_FRONT, RIGHT_BACK}, MotorGearset::blue); // right motor group - ports 6, 7, 9 (reversed)
+MotorGroup leftMotors({LEFT_FRONT, LEFT_MIDDLE, LEFT_BACK}, MotorGearset::blue); // left motor group - ports 3 (reversed), 4, 5 (reversed)
+MotorGroup rightMotors({RIGHT_FRONT, RIGHT_MIDDLE, RIGHT_BACK}, MotorGearset::blue); // right motor group - ports 6, 7, 9 (reversed)
 
 // intake testing
 MotorGroup intakeMotors({INT_CW, INT_CCW}, MotorGearset::blue);
