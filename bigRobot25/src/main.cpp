@@ -4,35 +4,43 @@
 
 using namespace pros;
 
+// INITIALIZE CONSTANTS
+
 // controller
 Controller controller(E_CONTROLLER_MASTER);
 
+// vision
 Vision visionSensor(VIS_PORT);
 
 vision_signature_s_t RED_BLOCK = Vision::signature_from_utility(RED_BLOCK_ID, 8897, 10143, 9520, -863, -129, -496, 3.000, 0);
 vision_signature_s_t BLUE_BLOCK = Vision::signature_from_utility (BLUE_BLOCK_ID, -4197, -3603, -3900, 2015, 8441, 5228, 5.000, 0);
 
+<<<<<<< HEAD
 // motor groups
 MotorGroup leftMotors({LEFT_FRONT, LEFT_MIDDLE, LEFT_BACK}, MotorGearset::blue); // left motor group - ports 3 (reversed), 4, 5 (reversed)
 MotorGroup rightMotors({RIGHT_FRONT, RIGHT_MIDDLE, RIGHT_BACK}, MotorGearset::blue); // right motor group - ports 6, 7, 9 (reversed)
+=======
+// drive motor groups
+MotorGroup leftMotors({LEFT_FRONT, LEFT_BACK}, MotorGearset::blue);
+MotorGroup rightMotors({RIGHT_FRONT, RIGHT_BACK}, MotorGearset::blue);
+>>>>>>> b538ad29907720a37bfd21216b1c8ccd08c51ea0
 
-// intake testing
-MotorGroup intakeMotors({INT_CW, INT_CCW}, MotorGearset::blue);
-Motor outTop(OUT_TOP);  
-Motor outBot(OUT_BOT); 
+// intake and outtake motors
+MotorGroup intakeMotors({INT_CW, INT_CCW}, MotorGearset::green);
+Motor outTop(OUT_TOP, MotorGearset::green);  
+Motor outBot(OUT_BOT, MotorGearset::green); 
 
-// Inertial Sensor on port 11
-Imu imu(11);
-
-// tracking wheels
+// tracking wheels - NONE OF THIS IS ACTUALLY USED
 // horizontal tracking wheel encoder. Rotation sensor, port 20, not reversed
 Rotation horizontalEnc(20);
 // vertical tracking wheel encoder. Rotation sensor, port 11, reversed
-Rotation verticalEnc(-11);
+Rotation verticalEnc(-10);
 // horizontal tracking wheel. 2.75" diameter, 5.75" offset, back of the robot (negative)
 lemlib::TrackingWheel horizontal(&horizontalEnc, lemlib::Omniwheel::NEW_275, -5.75);
 // vertical tracking wheel. 2.75" diameter, 2.5" offset, left of the robot (negative)
 lemlib::TrackingWheel vertical(&verticalEnc, lemlib::Omniwheel::NEW_275, -2.5);
+// Inertial Sensor on port 11
+Imu imu(1);
 
 // drivetrain settings
 lemlib::Drivetrain drivetrain(&leftMotors, // left motor group
@@ -99,6 +107,8 @@ lemlib::Chassis chassis(drivetrain, linearController, angularController, sensors
 void initialize() {
     lcd::initialize(); // initialize brain screen
     chassis.calibrate(); // calibrate sensors
+    leftMotors.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+    rightMotors.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 }
 
 /**
@@ -115,7 +125,7 @@ void competition_initialize() {}
 // this needs to be put outside a function
 ASSET(example_txt); // '.' replaced with "_" to make c++ happy
 
-/**
+/*
  * Runs during auto
  *
  * This is an example autonomous routine which demonstrates a lot of the features LemLib has to offer
@@ -143,10 +153,8 @@ void autonomous() {
     // the movement will run immediately
     // Unless its another movement, in which case it will wait
     chassis.waitUntil(10);
-    lcd::print(4, "Traveled 10 inches during pure pursuit!");
     // wait until the movement is done
     chassis.waitUntilDone();
-    lcd::print(4, "pure pursuit finished!");
 }
 
 // drive
@@ -166,44 +174,60 @@ void drive() {
 
 // intake based off of color
 void intake() {
-    // get biggest object (doesn't work as expected)
-    vision_object_s_t biggestObj = visionSensor.get_by_size(LARGEST);
-
-    // if R1 is pressed, spin slow
+    // if R2 is pressed, spin slow
     if (controller.get_digital(E_CONTROLLER_DIGITAL_R2)) {
-        intakeMotors.move(25);
+        intakeMotors.move(SLOW);
+
+        // get biggest object (doesn't work as expected)
+        vision_object_s_t biggestObj = visionSensor.get_by_size(LARGEST);
+
         // if a color is sensed, spin faster in the correct direction
-        if (biggestObj.signature == OPP_ID) {
-            intakeMotors.move(-100);
+        if (biggestObj.signature == VISION_OBJECT_ERR_SIG) {
+            intakeMotors.move(FAST);
+        }
+        else if (biggestObj.signature == OPP_ID) {
+            intakeMotors.move(-FAST);
         }
         else if (biggestObj.signature == TEAM_ID) {
-            intakeMotors.move(100);
+            intakeMotors.move(FAST);
         }
     }
     else {
-        intakeMotors.move(0);
+        intakeMotors.move(HALT);
     }
+
+    // if (controller.get_digital(E_CONTROLLER_DIGITAL_R2)) {
+    //     intakeMotors.move(FAST);
+    // }
+    // else {
+    //     intakeMotors.move(HALT);
+    // }
 }
 
 // Does outake based off of button press
 void outake() {
-    // if (controller.get_digital(E_CONTROLLER_DIGITAL_R1)) {
-    //     outBot.move(-100);
-    // }
-    // else 
-    if (controller.get_digital(E_CONTROLLER_DIGITAL_L1)) {
-        outTop.move(-100);
-        outBot.move(100);
+    if (controller.get_digital(E_CONTROLLER_DIGITAL_A)) {
+        outBot.move(-FAST);
+    }
+    else if (controller.get_digital(E_CONTROLLER_DIGITAL_L1) && controller.get_digital(E_CONTROLLER_DIGITAL_L2)) {
+        outTop.move(FAST);
+        outBot.move(FAST);
+    }
+    else if (controller.get_digital(E_CONTROLLER_DIGITAL_L1)) {
+        outTop.move(-FAST);
+        outBot.move(FAST);
     }
     else if (controller.get_digital(E_CONTROLLER_DIGITAL_L2)) {
-        outTop.move(100);
-        outBot.move(100);
+        outTop.move(FAST);
+        outBot.move(FAST);
     }
     else {
-        outTop.move(0);
-        outBot.move(0);
+        outTop.move(HALT);
+        outBot.move(HALT);
     }
 }
+
+// 1 2 3 4 5 6 7 8 9 0
 
 /*
  * Runs in driver control

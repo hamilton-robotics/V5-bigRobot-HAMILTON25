@@ -1,3 +1,17 @@
+**DECEMBTER 6 UPDATE:** 
+
+__Done:__  
+Draft of all small robot code\
+Got repo to work on a computer that isn't this Mac  
+
+__To Do:__  
+Tune PID\
+Tune color sensors to mount\
+Test motor directions/velocities\
+
+__Bugs:__  
+The largest object in vision sensor is not correct. It always uses red/team if it's seen.\
+
 **DECEMBTER 2 UPDATE:** 
 
 __Done:__  
