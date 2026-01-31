@@ -10,19 +10,19 @@ const int TEAM_ID = RED_BLOCK_ID;
 const int OPP_ID = BLUE_BLOCK_ID;
 
 // motors for chassis and intake
-const int LEFT_FRONT = 12;
-const int LEFT_MIDDLE = 14;
-const int LEFT_BACK = 19;
-const int RIGHT_FRONT = 13;
-const int RIGHT_MIDDLE = 15;
-const int RIGHT_BACK = 11;
+const int LEFT_FRONT = 11;
+const int LEFT_MIDDLE = 12;
+const int LEFT_BACK = 13;
+const int RIGHT_FRONT = 16;
+const int RIGHT_MIDDLE = 17;
+const int RIGHT_BACK = 18;
 
-const int INT_CW = 2;
-const int INT_CCW = -3;
-const int INT_ASSIST = 4;
+const int INT_CW = 6;
+const int INT_CCW = -7;
+const int INT_ASSIST = 8;
 
-const int OUT_TOP = 6;
-const int OUT_BOT = -7;
+const int OUT_TOP = 10;
+const int OUT_BOT = -9;
 
 // motor speeds
 const int FAST = 100;

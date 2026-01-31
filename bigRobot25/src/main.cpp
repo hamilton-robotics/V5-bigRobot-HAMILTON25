@@ -15,18 +15,12 @@ Vision visionSensor(VIS_PORT);
 vision_signature_s_t RED_BLOCK = Vision::signature_from_utility(RED_BLOCK_ID, 8897, 10143, 9520, -863, -129, -496, 3.000, 0);
 vision_signature_s_t BLUE_BLOCK = Vision::signature_from_utility (BLUE_BLOCK_ID, -4197, -3603, -3900, 2015, 8441, 5228, 5.000, 0);
 
-<<<<<<< HEAD
-// motor groups
+// drive motor groups
 MotorGroup leftMotors({LEFT_FRONT, LEFT_MIDDLE, LEFT_BACK}, MotorGearset::blue); // left motor group - ports 3 (reversed), 4, 5 (reversed)
 MotorGroup rightMotors({RIGHT_FRONT, RIGHT_MIDDLE, RIGHT_BACK}, MotorGearset::blue); // right motor group - ports 6, 7, 9 (reversed)
-=======
-// drive motor groups
-MotorGroup leftMotors({LEFT_FRONT, LEFT_BACK}, MotorGearset::blue);
-MotorGroup rightMotors({RIGHT_FRONT, RIGHT_BACK}, MotorGearset::blue);
->>>>>>> b538ad29907720a37bfd21216b1c8ccd08c51ea0
 
 // intake and outtake motors
-MotorGroup intakeMotors({INT_CW, INT_CCW}, MotorGearset::green);
+MotorGroup intakeMotors({INT_CW, INT_CCW, INT_ASSIST}, MotorGearset::green);
 Motor outTop(OUT_TOP, MotorGearset::green);  
 Motor outBot(OUT_BOT, MotorGearset::green); 
 
@@ -163,10 +157,10 @@ void drive() {
     int rightX = controller.get_analog(E_CONTROLLER_ANALOG_RIGHT_X);
     int leftY = controller.get_analog(E_CONTROLLER_ANALOG_LEFT_Y);
 
-    if (controller.get_digital(E_CONTROLLER_DIGITAL_R1)) {
-        rightX /= 2;
-        leftY /= 2;
-    }
+    // if (controller.get_digital(E_CONTROLLER_DIGITAL_R1)) {
+    //     rightX /= 2;
+    //     leftY /= 2;
+    // }
 
     // move the chassis with curvature drive
     chassis.arcade(rightX, leftY);
@@ -191,6 +185,9 @@ void intake() {
         else if (biggestObj.signature == TEAM_ID) {
             intakeMotors.move(FAST);
         }
+    }
+    else if (controller.get_digital(E_CONTROLLER_DIGITAL_R1)) {
+        intakeMotors.move(-FAST);
     }
     else {
         intakeMotors.move(HALT);
