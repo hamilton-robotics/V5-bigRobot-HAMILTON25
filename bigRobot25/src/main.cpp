@@ -173,7 +173,7 @@ void drive() {
 void intake() {
     // if R2 is pressed, spin slow
     if (controller.get_digital(E_CONTROLLER_DIGITAL_R2)) {
-        intakeMotors.move(SLOW);
+        intakeMotors.move(FAST);
 
         // get biggest object (doesn't work as expected)
         vision_object_s_t biggestObj = visionSensor.get_by_size(LARGEST);
